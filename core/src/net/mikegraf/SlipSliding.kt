@@ -6,25 +6,32 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 
+
 class SlipSliding : ApplicationAdapter() {
     private lateinit var batch: SpriteBatch
-    private lateinit var img: Texture
+    private lateinit var gameStateManager: GameStateManager
+    private var accumulator: Float = 0f
 
     override fun create() {
         batch = SpriteBatch()
-        img = Texture("badlogic.jpg")
+        val gameStateFactory = GameStateFactory()
+        gameStateManager = GameStateManager(gameStateFactory)
     }
 
     override fun render() {
-        Gdx.gl.glClearColor(1f, 0f, 0f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        batch.begin()
-        batch.draw(img, 0f, 0f)
-        batch.end()
+        accumulator += Gdx.graphics.deltaTime
+        while (accumulator >= FRAME_RATE) {
+            accumulator -= FRAME_RATE
+            gameStateManager.update(FRAME_RATE)
+            gameStateManager.render(batch, FRAME_RATE)
+        }
     }
 
     override fun dispose() {
         batch.dispose()
-        img.dispose()
+    }
+
+    companion object {
+        val FRAME_RATE: Float = 1/60f
     }
 }
