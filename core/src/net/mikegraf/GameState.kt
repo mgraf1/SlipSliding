@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Disposable
 /**
  * Created by Graf on 4/2/2017.
  */
-open abstract class GameState(protected val assetManager: AssetManager): Disposable {
+abstract class GameState(protected val assetManager: AssetManager): Disposable {
 
     override fun dispose() {
         assetManager.dispose()
