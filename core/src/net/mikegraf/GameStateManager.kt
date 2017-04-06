@@ -11,7 +11,7 @@ class GameStateManager(private val gameStateFactory: GameStateFactory) {
 
     val stateStack = Stack<GameState>()
     init {
-        pushState(StateType.DEMO)
+        pushState(StateType.LEVEL)
     }
 
     fun pushState(type: StateType) {

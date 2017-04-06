@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.Vector2
 
 
 class SlipSliding : ApplicationAdapter() {
@@ -32,6 +33,16 @@ class SlipSliding : ApplicationAdapter() {
     }
 
     companion object {
-        val FRAME_RATE: Float = 1/60f
+        val FRAME_RATE = 1/60f
+        val GAME_WIDTH = 320f
+        val GAME_HEIGHT = 240f
+        val PIXELS_PER_METER = 100f
+        val GRAVITY = Vector2(0f, 0f)
+        val VELOCITY_ITERATIONS = 6
+        val POSITION_ITERATIONS = 2
+
+        fun getBox2dCoords(renderCoords: Float): Float {
+            return renderCoords / PIXELS_PER_METER
+        }
     }
 }

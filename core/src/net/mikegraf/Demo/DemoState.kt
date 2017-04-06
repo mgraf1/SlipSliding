@@ -1,4 +1,4 @@
-package net.mikegraf
+package net.mikegraf.Demo
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetDescriptor
@@ -6,6 +6,7 @@ import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import net.mikegraf.GameState
 
 /**
  * Created by Graf on 4/2/2017.

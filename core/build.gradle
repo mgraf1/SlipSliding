@@ -21,12 +21,12 @@ eclipse.project {
 }
 buildscript {
     ext.kotlin_version = '1.1.1'
-
     ext.mokito_kotlin_version = '1.4.0'
     ext.spek_version = '1.0.89'
     ext.junit_version = '5.0.0-ALPHA'
     ext.junit_platform_gradle_plugin_version = '1.0.0-M2'
     ext.hamkrest_version = '1.2.2.0'
+    ext.junit_vintage_version = '4.12.0-M4'
 
     repositories {
         mavenCentral()
@@ -46,7 +46,6 @@ dependencies {
     testCompile "org.jetbrains.spek:spek-api:$spek_version"
     testCompile "com.nhaarman:mockito-kotlin:$mokito_kotlin_version"
     testCompile "com.natpryce:hamkrest:$hamkrest_version"
-
     runtime "org.junit.platform:junit-platform-launcher:$junit_platform_gradle_plugin_version"
     runtime "org.jetbrains.spek:spek-junit-platform-engine:$spek_version"
 }
