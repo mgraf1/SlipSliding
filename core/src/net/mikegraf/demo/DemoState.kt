@@ -1,4 +1,4 @@
-package net.mikegraf.Demo
+package net.mikegraf.demo
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetDescriptor

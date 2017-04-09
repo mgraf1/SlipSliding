@@ -4,8 +4,8 @@ import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.physics.box2d.World
-import net.mikegraf.Demo.DemoState
-import net.mikegraf.Level.LevelState
+import net.mikegraf.demo.DemoState
+import net.mikegraf.level.LevelState
 import net.mikegraf.SlipSliding.Companion.GRAVITY
 
 /**
