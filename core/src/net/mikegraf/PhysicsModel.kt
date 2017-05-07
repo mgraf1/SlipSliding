@@ -6,12 +6,12 @@ import com.badlogic.gdx.physics.box2d.Body
 /**
  * Created by Graf on 4/9/2017.
  */
-class PhysicsModel(private val body: Body) {
+class PhysicsModel(private val body: Body, private val renderWidth: Float, private val renderHeight: Float) {
     private val _position: Vector2 = Vector2()
 
     val position: Vector2
         get() {
-            SlipSliding.getRenderCoords(_position, body.position)
+            SlipSliding.getRenderCoords(_position, body.position, renderWidth, renderHeight)
             return _position
         }
     val isActive: Boolean

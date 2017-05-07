@@ -10,10 +10,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
-import com.badlogic.gdx.physics.box2d.BodyDef
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
-import com.badlogic.gdx.physics.box2d.CircleShape
-import com.badlogic.gdx.physics.box2d.World
+import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.physics.box2d.*
 import net.mikegraf.GameState
 import net.mikegraf.PhysicsModel
 import net.mikegraf.SlipSliding
@@ -22,26 +20,21 @@ import net.mikegraf.SlipSliding.Companion.GAME_WIDTH
 import net.mikegraf.SlipSliding.Companion.VELOCITY_ITERATIONS
 import net.mikegraf.SlipSliding.Companion.POSITION_ITERATIONS
 import net.mikegraf.level.controller.LevelInput
+import net.mikegraf.level.model.MyContactListener
 import net.mikegraf.level.view.BoundedOrthoCamera
 
 class LevelState(private val map: TiledMap, private val world: World, assetManager: AssetManager): GameState(assetManager) {
     val debugMode = false
 
     private val debugRenderer = Box2DDebugRenderer()
-    private val debugCam = OrthographicCamera()
+    private val debugCam = BoundedOrthoCamera(SlipSliding.getBox2dValue(GAME_WIDTH), SlipSliding.getBox2dValue(GAME_HEIGHT))
     private val cam = BoundedOrthoCamera(GAME_WIDTH, GAME_HEIGHT)
     private val mapRenderer = OrthogonalTiledMapRenderer(map)
     private lateinit var player: Player
 
     init {
-        setupMainCamera()
-        val box2dWidth = SlipSliding.getBox2dValue(GAME_WIDTH)
-        val box2dHeight = SlipSliding.getBox2dValue(GAME_HEIGHT)
-        debugCam.setToOrtho(false, box2dWidth, box2dHeight)
-    }
+        world.setContactListener(MyContactListener())
 
-    private fun setupMainCamera() {
-        cam.setToOrtho(false, GAME_WIDTH, GAME_HEIGHT)
         val mapWidth = map.properties.get("width", Int::class.java)
         val mapHeight = map.properties.get("height", Int::class.java)
         val tileWidth = map.properties.get("tilewidth", Int::class.java)
@@ -49,8 +42,13 @@ class LevelState(private val map: TiledMap, private val world: World, assetManag
 
         val mapWidthInPixels = (mapWidth * tileWidth).toFloat()
         val mapHeightInPixels = (mapHeight * tileHeight).toFloat()
+        val b2dMapWidthInPixels = SlipSliding.getBox2dValue(mapWidthInPixels)
+        val b2dMapHeightInPixels = SlipSliding.getBox2dValue(mapHeightInPixels)
 
-        this.cam.setBounds(0f, 0f, mapWidthInPixels, mapHeightInPixels)
+        cam.setBounds(0f, 0f, mapWidthInPixels, mapHeightInPixels)
+        debugCam.setBounds(0f, 0f, b2dMapWidthInPixels, b2dMapHeightInPixels)
+
+        placeBorder(b2dMapWidthInPixels, b2dMapHeightInPixels)
     }
 
     override fun loadAssets() {
@@ -64,14 +62,20 @@ class LevelState(private val map: TiledMap, private val world: World, assetManag
     override fun render(batch: SpriteBatch, deltaTime: Float) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
-        cam.moveTo(player.position.x, player.position.y)
+        val playerX = player.position.x
+        val playerY = player.position.y
+        cam.moveTo(playerX, playerY)
+        debugCam.moveTo(SlipSliding.getBox2dValue(playerX), SlipSliding.getBox2dValue(playerY))
+
         cam.update()
+        if (debugMode) {
+            debugCam.update()
+        }
 
         mapRenderer.setView(cam)
         mapRenderer.render()
 
         if (debugMode) {
-            debugCam.update()
             debugRenderer.render(world, debugCam.combined)
         }
 
@@ -93,7 +97,68 @@ class LevelState(private val map: TiledMap, private val world: World, assetManag
         map.dispose()
     }
 
+    private fun placeBorder(mapWidthInPixels: Float, mapHeightInPixels: Float) {
+        val fDef = FixtureDef()
+        val bDef = BodyDef()
+
+        val eShape = EdgeShape()
+        fDef.shape = eShape
+
+        // Left wall.
+        eShape.set(0f, 0f, 0f, mapHeightInPixels)
+        bDef.position.set(0f, 0f)
+        val leftWall = world.createBody(bDef)
+        leftWall.createFixture(fDef)
+
+        // Bottom wall.
+        eShape.set(0f, 0f, mapWidthInPixels, 0f)
+        bDef.position.set(0f, 0f)
+        val bottomWall = world.createBody(bDef)
+        bottomWall.createFixture(fDef)
+
+        // Right wall.
+        eShape.set(mapWidthInPixels, 0f, mapWidthInPixels, mapHeightInPixels)
+        bDef.position.set(0f, 0f)
+        val rightWall = world.createBody(bDef)
+        rightWall.createFixture(fDef)
+
+        // Top wall.
+        eShape.set(0f, mapHeightInPixels, mapWidthInPixels, mapHeightInPixels)
+        bDef.position.set(0f, 0f)
+        val topWall = world.createBody(bDef)
+        topWall.createFixture(fDef)
+    }
+
     private fun createPlayer(): Player {
+        val animationIndex = createPlayerAnimationIndex()
+        val region = animationIndex.getKeyFrame(0f)
+        val renderWidth = region.regionWidth.toFloat()
+        val renderHeight = region.regionHeight.toFloat()
+
+        val physModel = createPlayerPhysicsModel(renderWidth, renderHeight)
+
+        return Player(animationIndex, physModel)
+    }
+
+    private fun createPlayerPhysicsModel(renderWidth: Float, renderHeight: Float): PhysicsModel {
+        val bodyShape = CircleShape()
+        bodyShape.radius = SlipSliding.getBox2dValue(PLAYER_RADIUS)
+        val bodyDef = BodyDef()
+        val fixtureDef = FixtureDef()
+
+        bodyDef.type = BodyDef.BodyType.DynamicBody
+        fixtureDef.shape = bodyShape
+
+        val body = world.createBody(bodyDef)
+        body.createFixture(fixtureDef)
+
+        val physModel = PhysicsModel(body, renderWidth, renderHeight)
+        bodyShape.dispose()
+
+        return physModel
+    }
+
+    private fun createPlayerAnimationIndex(): AnimationIndex {
         val playerTexture: Texture = assetManager.get(PLAYER_TEXTURE_PATH)
         val tempFrames = TextureRegion.split(
                 playerTexture,
@@ -106,15 +171,7 @@ class LevelState(private val map: TiledMap, private val world: World, assetManag
         animationIndex.add(Player.WALK_RIGHT_ANIMATION, Animation(ANIMATION_FRAME_DURATION, tempFrames[1][0]))
         animationIndex.add(Player.WALK_DOWN_ANIMATION, Animation(ANIMATION_FRAME_DURATION, tempFrames[1][1]))
 
-        val bodyShape = CircleShape()
-        bodyShape.radius = SlipSliding.getBox2dValue(PLAYER_RADIUS)
-        val bodyDef = BodyDef()
-        bodyDef.type = BodyDef.BodyType.DynamicBody
-
-        val body = world.createBody(bodyDef)
-        val physModel = PhysicsModel(body)
-
-        return Player(animationIndex, physModel)
+        return animationIndex
     }
 
     companion object {

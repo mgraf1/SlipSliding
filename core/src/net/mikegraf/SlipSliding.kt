@@ -41,14 +41,14 @@ class SlipSliding(val inputHandler: InputAdapter) : ApplicationAdapter() {
         val VELOCITY_ITERATIONS = 6
         val POSITION_ITERATIONS = 2
 
-        fun getBox2dCoords(vectorToPopulate: Vector2, renderCoords: Vector2) {
-            vectorToPopulate.x = renderCoords.x / PIXELS_PER_METER
-            vectorToPopulate.y = renderCoords.y / PIXELS_PER_METER
+        fun getBox2dCoords(vectorToPopulate: Vector2, renderCoords: Vector2, width: Float, height: Float) {
+            vectorToPopulate.x = renderCoords.x / PIXELS_PER_METER - ((width / PIXELS_PER_METER) / 2)
+            vectorToPopulate.y = renderCoords.y / PIXELS_PER_METER - ((height / PIXELS_PER_METER) / 2)
         }
 
-        fun getRenderCoords(vectorToPopulate: Vector2, box2dCoords: Vector2) {
-            vectorToPopulate.x = box2dCoords.x * PIXELS_PER_METER
-            vectorToPopulate.y = box2dCoords.y * PIXELS_PER_METER
+        fun getRenderCoords(vectorToPopulate: Vector2, box2dCoords: Vector2, width: Float, height: Float) {
+            vectorToPopulate.x = box2dCoords.x * PIXELS_PER_METER - (width / 2)
+            vectorToPopulate.y = box2dCoords.y * PIXELS_PER_METER - (height / 2)
         }
 
         fun getBox2dValue(value: Float): Float {
