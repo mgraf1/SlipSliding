@@ -2,7 +2,6 @@ package net.mikegraf.level
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
-import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
@@ -10,9 +9,7 @@ import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.maps.tiled.TiledMap
-import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
-import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.CircleShape
@@ -24,10 +21,8 @@ import net.mikegraf.SlipSliding.Companion.GAME_HEIGHT
 import net.mikegraf.SlipSliding.Companion.GAME_WIDTH
 import net.mikegraf.SlipSliding.Companion.VELOCITY_ITERATIONS
 import net.mikegraf.SlipSliding.Companion.POSITION_ITERATIONS
+import net.mikegraf.level.controller.LevelInput
 
-/**
- * Created by Graf on 4/2/2017.
- */
 class LevelState(private val map: TiledMap, private val world: World, assetManager: AssetManager): GameState(assetManager) {
     val debugMode = false
 
@@ -73,6 +68,7 @@ class LevelState(private val map: TiledMap, private val world: World, assetManag
 
     override fun update(deltaTime: Float) {
         world.step(deltaTime, VELOCITY_ITERATIONS, POSITION_ITERATIONS)
+        LevelInput.update()
     }
 
     override fun dispose() {

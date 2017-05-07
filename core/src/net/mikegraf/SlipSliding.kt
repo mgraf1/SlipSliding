@@ -2,14 +2,12 @@ package net.mikegraf
 
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.math.Vector
 import com.badlogic.gdx.math.Vector2
 
 
-class SlipSliding : ApplicationAdapter() {
+class SlipSliding(val inputHandler: InputAdapter) : ApplicationAdapter() {
     private lateinit var batch: SpriteBatch
     private lateinit var gameStateManager: GameStateManager
     private var accumulator: Float = 0f
@@ -18,6 +16,7 @@ class SlipSliding : ApplicationAdapter() {
         batch = SpriteBatch()
         val gameStateFactory = GameStateFactory()
         gameStateManager = GameStateManager(gameStateFactory)
+        Gdx.input.inputProcessor = inputHandler
     }
 
     override fun render() {

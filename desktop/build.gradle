@@ -1,10 +1,30 @@
 apply plugin: "java"
+apply plugin: 'kotlin'
 
 sourceCompatibility = 1.6
 sourceSets.main.java.srcDirs = [ "src/" ]
 
 project.ext.mainClassName = "net.mikegraf.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets");
+
+buildscript {
+    ext.kotlin_version = '1.1.1'
+
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+}
 
 task run(dependsOn: classes, type: JavaExec) {
     main = project.mainClassName

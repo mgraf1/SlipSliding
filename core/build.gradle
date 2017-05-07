@@ -40,6 +40,7 @@ repositories {
 }
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
     testCompile "org.junit:junit5-api:$junit_version"
     testCompile "org.jetbrains.spek:spek-api:$spek_version"
