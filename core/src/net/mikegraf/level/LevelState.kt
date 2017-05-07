@@ -22,21 +22,35 @@ import net.mikegraf.SlipSliding.Companion.GAME_WIDTH
 import net.mikegraf.SlipSliding.Companion.VELOCITY_ITERATIONS
 import net.mikegraf.SlipSliding.Companion.POSITION_ITERATIONS
 import net.mikegraf.level.controller.LevelInput
+import net.mikegraf.level.view.BoundedOrthoCamera
 
 class LevelState(private val map: TiledMap, private val world: World, assetManager: AssetManager): GameState(assetManager) {
     val debugMode = false
 
     private val debugRenderer = Box2DDebugRenderer()
     private val debugCam = OrthographicCamera()
-    private val cam = OrthographicCamera()
+    private val cam = BoundedOrthoCamera(GAME_WIDTH, GAME_HEIGHT)
     private val mapRenderer = OrthogonalTiledMapRenderer(map)
     private lateinit var player: Player
 
     init {
-        cam.setToOrtho(false, GAME_WIDTH, GAME_HEIGHT)
+        setupMainCamera()
         val box2dWidth = SlipSliding.getBox2dValue(GAME_WIDTH)
         val box2dHeight = SlipSliding.getBox2dValue(GAME_HEIGHT)
         debugCam.setToOrtho(false, box2dWidth, box2dHeight)
+    }
+
+    private fun setupMainCamera() {
+        cam.setToOrtho(false, GAME_WIDTH, GAME_HEIGHT)
+        val mapWidth = map.properties.get("width", Int::class.java)
+        val mapHeight = map.properties.get("height", Int::class.java)
+        val tileWidth = map.properties.get("tilewidth", Int::class.java)
+        val tileHeight = map.properties.get("tileheight", Int::class.java)
+
+        val mapWidthInPixels = (mapWidth * tileWidth).toFloat()
+        val mapHeightInPixels = (mapHeight * tileHeight).toFloat()
+
+        this.cam.setBounds(0f, 0f, mapWidthInPixels, mapHeightInPixels)
     }
 
     override fun loadAssets() {
@@ -50,7 +64,7 @@ class LevelState(private val map: TiledMap, private val world: World, assetManag
     override fun render(batch: SpriteBatch, deltaTime: Float) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
-        cam.position.set(player.position, 0f)
+        cam.moveTo(player.position.x, player.position.y)
         cam.update()
 
         mapRenderer.setView(cam)

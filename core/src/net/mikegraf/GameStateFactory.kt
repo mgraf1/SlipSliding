@@ -8,9 +8,6 @@ import net.mikegraf.demo.DemoState
 import net.mikegraf.level.LevelState
 import net.mikegraf.SlipSliding.Companion.GRAVITY
 
-/**
- * Created by Graf on 4/2/2017.
- */
 class GameStateFactory() {
     val levelNumber = 0
 
