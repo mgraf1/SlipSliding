@@ -16,5 +16,9 @@ class PhysicsModel(private val body: Body) {
         }
     val isActive: Boolean
         get() = body.isActive
+
+    fun applyForce(force: Vector2) {
+        body.applyForceToCenter(force, true)
+    }
 }
 

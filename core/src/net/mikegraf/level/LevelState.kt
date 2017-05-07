@@ -69,6 +69,8 @@ class LevelState(private val map: TiledMap, private val world: World, assetManag
     override fun update(deltaTime: Float) {
         world.step(deltaTime, VELOCITY_ITERATIONS, POSITION_ITERATIONS)
         LevelInput.update()
+
+        player.update(deltaTime)
     }
 
     override fun dispose() {
